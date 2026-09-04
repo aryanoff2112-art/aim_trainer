@@ -1,16 +1,23 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
-*.pyd
+*.egg-info/
+.Python
+build/
+dist/
 
-.env
-.venv
+# Virtual environments
 venv/
+.venv/
+env/
 
-.idea/
+# Local save data (regenerated at runtime - don't ship your own scores)
+stats.json
+user_settings.json
+
+# Editor / OS
 .vscode/
-
-Thumbs.db
+.idea/
 .DS_Store
-
-*.log
+Thumbs.db
