@@ -1,21 +1,20 @@
 import random
 
-from settings import GRIDSHOT_DURATION, GRIDSHOT_TARGET_SIZE
+from settings import PRECISION_ROUNDS, PRECISION_TARGET_SIZE
 from target import Target
 from modes.single_target import SingleTargetMode
 
+class Precision(SingleTargetMode):
+    """Like Gridshot but with very small targets, so the bullseye zone
+    scoring in Target.zone_multiplier actually matters - this mode is
+    about precision, not speed."""
 
-class Gridshot(SingleTargetMode):
-    """Classic single-target-at-a-time drill: one fixed-size target,
-    replaced instantly on hit, for a fixed duration. Isolates raw flick
-    speed and click precision rather than timing pressure."""
-
-    name = "Gridshot"
+    name = "Precision"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.target_size = GRIDSHOT_TARGET_SIZE
-        self.duration = GRIDSHOT_DURATION
+        self.target_size = PRECISION_TARGET_SIZE
+        self.rounds = PRECISION_ROUNDS
 
     def spawn_target(self):
         left, top, right, bottom = self.bounds()
@@ -28,8 +27,7 @@ class Gridshot(SingleTargetMode):
         self.targets.append(target)
 
     def hud_extra(self):
-        remaining = max(0, self.duration - self.elapsed_time)
-        return [f"Time left {int(remaining)}s"]
+        return [f"Round {self.hits}/{self.rounds}"]
 
     def is_finished(self):
-        return self.elapsed_time >= self.duration
+        return self.hits >= self.rounds

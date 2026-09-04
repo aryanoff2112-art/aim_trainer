@@ -1,21 +1,21 @@
 import random
 
-from settings import GRIDSHOT_DURATION, GRIDSHOT_TARGET_SIZE
+from settings import REACTION_ROUNDS, REACTION_TARGET_SIZE, REACTION_DELAY_RANGE
 from target import Target
 from modes.single_target import SingleTargetMode
 
+class Reaction(SingleTargetMode):
+    """A target appears at a random spot after a randomized delay; click
+    it as fast as possible. Isolates pure reaction time from aiming
+    skill by giving the target a fixed, generous size."""
 
-class Gridshot(SingleTargetMode):
-    """Classic single-target-at-a-time drill: one fixed-size target,
-    replaced instantly on hit, for a fixed duration. Isolates raw flick
-    speed and click precision rather than timing pressure."""
-
-    name = "Gridshot"
+    name = "Reaction"
+    respawn_delay_range = REACTION_DELAY_RANGE
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.target_size = GRIDSHOT_TARGET_SIZE
-        self.duration = GRIDSHOT_DURATION
+        self.target_size = REACTION_TARGET_SIZE
+        self.rounds = REACTION_ROUNDS
 
     def spawn_target(self):
         left, top, right, bottom = self.bounds()
@@ -28,8 +28,7 @@ class Gridshot(SingleTargetMode):
         self.targets.append(target)
 
     def hud_extra(self):
-        remaining = max(0, self.duration - self.elapsed_time)
-        return [f"Time left {int(remaining)}s"]
+        return [f"Round {self.hits}/{self.rounds}"]
 
     def is_finished(self):
-        return self.elapsed_time >= self.duration
+        return self.hits >= self.rounds

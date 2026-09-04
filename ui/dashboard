@@ -1,0 +1,65 @@
+import pygame
+
+from settings import WIDTH, HEIGHT, BG_COLOR, TITLE_FONT, LABEL_FONT, SMALL_FONT
+from ui.menu import get_middle
+from achievements import ACHIEVEMENTS
+
+def show_dashboard(win, stats):
+    clock = pygame.time.Clock()
+
+    while True:
+        clock.tick(60)
+        win.fill(BG_COLOR)
+
+        title = TITLE_FONT.render("PERFORMANCE", True, "white")
+        win.blit(title, (get_middle(title), 16))
+
+        best_reaction = f"{stats['best_reaction_ms']}ms" if stats["best_reaction_ms"] is not None else "--"
+        lines = [
+            f"Games Played: {stats['games_played']}",
+            f"Best Precision: {stats['best_precision']}%",
+            f"Best Target Accuracy: {stats['best_target_accuracy']}%",
+            f"Best Reaction: {best_reaction}",
+            f"Best Speed: {stats['best_speed']} t/s",
+            f"Best Combo: x{stats['best_combo']}",
+            f"Total Hits: {stats['total_hits']}   Total Clicks: {stats['total_clicks']}",
+            f"Total Play Time: {int(stats['total_play_time'])}s",
+            f"Achievements Unlocked: {len(stats.get('achievements', []))}/{len(ACHIEVEMENTS)}",
+        ]
+        y = 80
+        for line in lines:
+            label = LABEL_FONT.render(line, True, "white")
+            win.blit(label, (get_middle(label), y))
+            y += 24
+
+        recent = stats["sessions"][-10:]
+        if recent:
+            chart_label = SMALL_FONT.render("Recent Precision Trend (last 10 sessions)", True, "cyan")
+            win.blit(chart_label, (get_middle(chart_label), y + 10))
+
+            chart_top = y + 40
+            chart_h = 110
+            bar_w, gap = 26, 10
+            total_w = len(recent) * (bar_w + gap) - gap
+            start_x = (WIDTH - total_w) // 2
+
+            pygame.draw.line(win, "white", (start_x - 10, chart_top + chart_h),
+                              (start_x + total_w + 10, chart_top + chart_h), 1)
+
+            for i, session in enumerate(recent):
+                pct = session.get("precision", 0)
+                bar_h = max(2, int((pct / 100) * chart_h))
+                x = start_x + i * (bar_w + gap)
+                pygame.draw.rect(win, (0, 200, 120), (x, chart_top + chart_h - bar_h, bar_w, bar_h))
+
+        back = SMALL_FONT.render("ESC / BACKSPACE to return", True, "yellow")
+        win.blit(back, (get_middle(back), HEIGHT - 28))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN and event.key in (pygame.K_ESCAPE, pygame.K_BACKSPACE):
+                return
