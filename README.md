@@ -26,7 +26,7 @@ weak-area recommendation — all in pure Python.
 - **C** — Settings
 - **D** — Performance dashboard
 - **R** — restart after a session
-- **Esc** — quit (from the main menu)
+- **Esc** — quit (from main menu)
 
 ## Installation
 
